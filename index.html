@@ -558,7 +558,12 @@
             document.getElementById(tabName + '-tab').classList.add('active');
             
             // Add active class to clicked button
-            event.target.classList.add('active');
+            const clickedButton = Array.from(buttons).find(btn => 
+                btn.textContent.toLowerCase() === tabName.toLowerCase()
+            );
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
         }
 
         // Three.js Background Animation
@@ -573,9 +578,9 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         
-        // Create particles
+        // Create particles (reduced count for better performance)
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1500;
+        const particlesCount = 800;
         const posArray = new Float32Array(particlesCount * 3);
         
         for(let i = 0; i < particlesCount * 3; i++) {
@@ -608,13 +613,20 @@
         
         camera.position.z = 50;
         
-        // Mouse interaction
+        // Mouse interaction with throttling
         let mouseX = 0;
         let mouseY = 0;
+        let isMouseMoving = false;
         
         document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            if (!isMouseMoving) {
+                isMouseMoving = true;
+                requestAnimationFrame(() => {
+                    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                    isMouseMoving = false;
+                });
+            }
         });
         
         // Animation loop
@@ -639,11 +651,17 @@
         
         animate();
         
-        // Handle window resize
+        // Handle window resize with throttling
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
+            }
+            resizeTimeout = setTimeout(() => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }, 150);
         });
     </script>
 </body>

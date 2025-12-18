@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JohnLin - Portfolio</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,26 +14,23 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 50%, #3a7ca5 100%);
+            background: #0a0a0a;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
             position: relative;
+            overflow: hidden;
         }
 
-        body::before {
-            content: '';
-            position: absolute;
+        #three-background {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
 
         .container {
@@ -43,15 +41,16 @@
         }
 
         .card {
-            background: linear-gradient(145deg, #f5f5f0 0%, #e8e8e0 100%);
+            background: linear-gradient(145deg, rgba(245, 245, 240, 0.95) 0%, rgba(232, 232, 224, 0.95) 100%);
             border-radius: 20px;
             padding: 50px;
             box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 20px 60px rgba(0, 0, 0, 0.5),
                 inset 0 1px 0 rgba(255, 255, 255, 0.6),
                 inset 0 -1px 0 rgba(0, 0, 0, 0.1);
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .card::before {
@@ -94,6 +93,78 @@
             margin: 20px auto 0;
             border-radius: 2px;
             box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+            border: 2px solid transparent;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .tab-button:hover::before {
+            left: 100%;
+        }
+
+        .tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
+            color: #fff;
+            border-color: #d4af37;
+            box-shadow: 0 6px 20px rgba(30, 58, 95, 0.4);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .bio-section {
@@ -156,6 +227,87 @@
                 0 2px 5px rgba(196, 30, 58, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
             margin: 0 3px;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #1e3a5f;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .skill-item:hover::before {
+            opacity: 1;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(30, 58, 95, 0.3);
+        }
+
+        .skill-item span {
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .skill-item:hover span {
+            color: #fff;
+        }
+
+        /* Projects Section */
+        .project-item {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f8f5 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 6px 20px rgba(30, 58, 95, 0.2);
+        }
+
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 10px;
+        }
+
+        .project-description {
+            color: #555;
+            line-height: 1.6;
         }
 
         .links-section {
@@ -277,29 +429,106 @@
     </style>
 </head>
 <body>
+    <canvas id="three-background"></canvas>
     <div class="container">
         <div class="card">
             <div class="header">
                 <h1 class="name">JohnLin</h1>
             </div>
 
-            <div class="bio-section">
-                <h2 class="bio-title">About Me</h2>
-                <div class="bio-content">
-                    <p>
-                        Hello! I'm a passionate programmer with a deep love for 
-                        <span class="tech-highlight">Go</span> (Golang) and 
-                        <span class="tech-highlight">C</span> language. 
-                        I enjoy building efficient, high-performance systems and exploring 
-                        the intricacies of low-level programming.
-                    </p>
-                    <p>
-                        When I'm not coding, you'll find me following 
-                        <span class="hobby-highlight">Formula 1</span> racing. 
-                        The precision, speed, and engineering excellence of 
-                        <span class="hobby-highlight">F1</span> 
-                        inspire my approach to software development.
-                    </p>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-button active" onclick="switchTab('about')">About</button>
+                <button class="tab-button" onclick="switchTab('skills')">Skills</button>
+                <button class="tab-button" onclick="switchTab('projects')">Projects</button>
+                <button class="tab-button" onclick="switchTab('hobbies')">Hobbies</button>
+            </div>
+
+            <!-- About Tab -->
+            <div id="about-tab" class="tab-content active">
+                <div class="bio-section">
+                    <h2 class="bio-title">About Me</h2>
+                    <div class="bio-content">
+                        <p>
+                            Hello! I'm a passionate programmer with a deep love for 
+                            <span class="tech-highlight">Go</span> (Golang) and 
+                            <span class="tech-highlight">C</span> language. 
+                            I enjoy building efficient, high-performance systems and exploring 
+                            the intricacies of low-level programming.
+                        </p>
+                        <p>
+                            I believe in writing clean, maintainable code and continuously learning 
+                            new technologies to stay at the forefront of software development.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Tab -->
+            <div id="skills-tab" class="tab-content">
+                <div class="bio-section">
+                    <h2 class="bio-title">Technical Skills</h2>
+                    <div class="skills-grid">
+                        <div class="skill-item"><span>Go</span></div>
+                        <div class="skill-item"><span>C</span></div>
+                        <div class="skill-item"><span>Python</span></div>
+                        <div class="skill-item"><span>JavaScript</span></div>
+                        <div class="skill-item"><span>Linux</span></div>
+                        <div class="skill-item"><span>Docker</span></div>
+                        <div class="skill-item"><span>Git</span></div>
+                        <div class="skill-item"><span>Algorithms</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Tab -->
+            <div id="projects-tab" class="tab-content">
+                <div class="bio-section">
+                    <h2 class="bio-title">Featured Projects</h2>
+                    <div class="bio-content">
+                        <div class="project-item">
+                            <div class="project-title">🚀 High-Performance Web Server</div>
+                            <div class="project-description">
+                                Built a concurrent web server in Go using goroutines and channels,
+                                handling thousands of requests per second with minimal latency.
+                            </div>
+                        </div>
+                        <div class="project-item">
+                            <div class="project-title">⚡ System Programming Tools</div>
+                            <div class="project-description">
+                                Developed low-level system utilities in C for process management
+                                and memory optimization on Linux systems.
+                            </div>
+                        </div>
+                        <div class="project-item">
+                            <div class="project-title">🔧 Network Protocol Implementation</div>
+                            <div class="project-description">
+                                Implemented custom network protocols for efficient data transfer
+                                in distributed systems.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hobbies Tab -->
+            <div id="hobbies-tab" class="tab-content">
+                <div class="bio-section">
+                    <h2 class="bio-title">Hobbies & Interests</h2>
+                    <div class="bio-content">
+                        <p>
+                            When I'm not coding, you'll find me following 
+                            <span class="hobby-highlight">Formula 1</span> racing. 
+                            The precision, speed, and engineering excellence of 
+                            <span class="hobby-highlight">F1</span> 
+                            inspire my approach to software development.
+                        </p>
+                        <p>
+                            I'm fascinated by the aerodynamics, telemetry systems, and the
+                            cutting-edge technology that goes into these racing machines.
+                            Just like in F1, I strive for optimal performance in every line of code I write.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -313,5 +542,128 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked button
+            const clickedButton = Array.from(buttons).find(btn => 
+                btn.textContent.toLowerCase() === tabName.toLowerCase()
+            );
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
+        }
+
+        // Three.js Background Animation
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas: document.getElementById('three-background'),
+            alpha: true,
+            antialias: true 
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        
+        // Create particles (reduced count for better performance)
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 800;
+        const posArray = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 100;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.15,
+            color: 0x4a9eff,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Create rotating geometry
+        const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x1e3a5f,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const torusKnot = new THREE.Mesh(geometry, material);
+        scene.add(torusKnot);
+        
+        camera.position.z = 50;
+        
+        // Mouse interaction with throttling
+        let mouseX = 0;
+        let mouseY = 0;
+        let isMouseMoving = false;
+        
+        document.addEventListener('mousemove', (event) => {
+            if (!isMouseMoving) {
+                isMouseMoving = true;
+                requestAnimationFrame(() => {
+                    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                    isMouseMoving = false;
+                });
+            }
+        });
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate particles
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x += 0.0005;
+            
+            // Rotate torus knot
+            torusKnot.rotation.x += 0.005;
+            torusKnot.rotation.y += 0.005;
+            
+            // Mouse interaction
+            camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle window resize with throttling
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
+            }
+            resizeTimeout = setTimeout(() => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }, 150);
+        });
+    </script>
 </body>
 </html>
+
